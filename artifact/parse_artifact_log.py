@@ -2,7 +2,7 @@
 """把 BetterGI OCRArtifacts 的扫描日志解析成结构化清单。
 
 输入：D:\\software\\BetterGI\\User\\JsScript\\OCRArtifacts\\records\\artifact_log_*.txt
-输出：同目录 artifacts.json（schema 兼容 score_artifacts.py）
+输出：同目录 artifacts.json（下游由 evaluate.py / assign.py 消费）
 
 用法：
     python parse_artifact_log.py [日志目录] [-o 输出路径] [--latest]
@@ -137,9 +137,12 @@ def parse_block(block):
                 break
 
     star = guess_star(set_type, lv)
-    sv = star_by_main_val(slot, main_val)
-    if sv is not None:
-        star = sv
+    # 主词条数值只在「套装不足以判断星级」时使用；
+    # 教官/战狂这类 4★ 专属套装的件本来就是 4★，不该被数值覆盖（2026-11-25 修）
+    if set_type not in STAR_3_SETS and set_type not in STAR_4_SETS:
+        sv = star_by_main_val(slot, main_val)
+        if sv is not None:
+            star = sv
     return {
         'name': name, 'slot': slot, 'main': main, 'mainVal': main_val,
         'lv': lv, 'star': star, 'setType': set_type, 'equip': equip, 'attr': attrs,
@@ -155,7 +158,7 @@ def signature(a):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('logdir', nargs='?',
-                    default=r'D:\software\BetterGI\User\JsScript\OCRArtifacts\records')
+                    default=os.path.join(BGI_HOME, 'User', 'JsScript', 'OCRArtifacts', 'records'))
     ap.add_argument('-o', '--out', default=None)
     ap.add_argument('--latest', action='store_true', help='只解析最新一份日志（当前背包快照）')
     args = ap.parse_args()

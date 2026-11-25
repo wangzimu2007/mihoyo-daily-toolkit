@@ -137,7 +137,7 @@ def infer_role(mains, subs):
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser()
-    ap.add_argument('--artifacts', default=r'D:\software\BetterGI\User\JsScript\OCRArtifacts\records\artifacts.json')
+    ap.add_argument('--artifacts', default=os.path.join(BGI_HOME, 'User', 'JsScript', 'OCRArtifacts', 'records', 'artifacts.json'))
     ap.add_argument('-o', '--out', default=os.path.join(here, 'characters.yaml'))
     ap.add_argument('--force', action='store_true', help='覆盖已有 characters.yaml')
     args = ap.parse_args()

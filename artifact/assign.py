@@ -77,7 +77,7 @@ def score_for(attrs, weights):
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser()
-    ap.add_argument('--artifacts', default=r'D:\software\BetterGI\User\JsScript\OCRArtifacts\records\artifacts.json')
+    ap.add_argument('--artifacts', default=os.path.join(BGI_HOME, 'User', 'JsScript', 'OCRArtifacts', 'records', 'artifacts.json'))
     ap.add_argument('-c', '--characters', default=os.path.join(here, 'characters.yaml'))
     ap.add_argument('-o', '--outdir', default=os.path.join(here, 'output'))
     args = ap.parse_args()

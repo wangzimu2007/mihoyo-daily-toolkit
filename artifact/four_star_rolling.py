@@ -72,7 +72,7 @@ def quality(item):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--artifacts', default=r'D:\software\BetterGI\User\JsScript\OCRArtifacts\records\artifacts.json')
+    ap.add_argument('--artifacts', default=os.path.join(BGI_HOME, 'User', 'JsScript', 'OCRArtifacts', 'records', 'artifacts.json'))
     ap.add_argument('-r', '--rules', default=os.path.join(HERE, 'rules.yaml'))
     ap.add_argument('-o', '--outdir', default=os.path.join(HERE, 'final'))
     args = ap.parse_args()

@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.0.1 (2026-11-25)
+
+补齐「开箱可用」缺的几块：
+
+- `artifact/requirements.txt`（PyYAML）
+- `artifact/run-pipeline.ps1` / `run-pipeline.sh`：一条命令跑完六步
+- `samples/artifact_log_sample.txt`：6 件样例日志（含 4★ 与元素伤害杯），可离线验证
+- `samples/offline-test.ps1`：不装游戏也能跑通 parse → evaluate → assign → make_final_lists
+- `scripts/install-tasks.ps1` / `uninstall-tasks.ps1`：一条命令注册/移除守夜与每日自动化计划任务（含开机自启）
+- **修复**：星级推断优先级 —— 4★ 专属套装（教官/战狂/流放者等）不再被主词条数值覆盖成 5★
+- **修复**：所有 Python 脚本默认路径改为 `BGI_HOME` 派生，不再写死本机路径
 ## v1.0.0 (2026-11-25)
 
 首个公开版本。所有内容来自一套实际运行的原神/绝区零/崩铁每日自动化环境。

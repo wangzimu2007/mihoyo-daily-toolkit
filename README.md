@@ -21,9 +21,10 @@
 |---|---|---|
 | [`artifact/`](artifact/) | 圣遗物整理流水线（解析 → 评分 → 角色分配 → 清单 → 锁定建议） | Python 3.8+、PyYAML |
 | [`reliability/`](reliability/) | 自动化可靠性工具（会话保活、跑完体检、锁屏诊断） | Windows PowerShell 5.1+ |
+| [`scripts/`](scripts/) | 计划任务安装/卸载（一条命令注册守夜与每日自动化） | Windows |
 | [`examples/`](examples/) | 真实在用的编排脚本（原神/绝区零/崩铁的调度链）**需按自己环境改路径** | BetterGI / ZZZ-OneDragon / March7thAssistant |
 | [`docs/`](docs/) | 踩坑记录与设计说明 | — |
-| [`samples/`](samples/) | 输出样例（报告、锁定方案） | — |
+| [`samples/`](samples/) | 输出样例 + **可离线自测的样例日志** | — |
 
 ## 输出长什么样
 
@@ -91,6 +92,7 @@ set_keep_if_any 155 / main_gate_pass 45 / dual_keep 41 / four_star_keep 38
 export BGI_HOME="D:/software/BetterGI"      # Windows: set BGI_HOME=D:\software\BetterGI
 
 cd artifact
+pip install -r requirements.txt
 python parse_artifact_log.py --latest        # 日志 → artifacts.json
 python evaluate.py                           # 规则评分 → keep/salvage/report
 python build_characters.py                   # 从已装备反推角色画像 → characters.yaml
@@ -99,7 +101,20 @@ python make_final_lists.py                   # 最终清单 + 锁定方案建议
 python four_star_rolling.py                  # 四星滚动淘汰
 ```
 
-输出在各自的 `output/` 与 `final/` 下，核心是 `report.md` 和 `salvage.csv`。
+Windows 上可以一条命令跑完：
+
+```powershell
+cd artifact
+.\run-pipeline.ps1 -BgiHome "D:\software\BetterGI"   # 或 .\run-pipeline.ps1 -Latest
+```
+
+**没有游戏也能先试**：仓库自带样例日志，一条命令跑通全流程。
+
+```powershell
+.\samples\offline-test.ps1
+```
+
+预期输出：解析 6/6、评分、分配、生成 `output/report.md` 与 `final/SUMMARY.md`。
 
 ### 可靠性：让凌晨的自动化真的能跑
 
