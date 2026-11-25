@@ -3,6 +3,7 @@
 [中文](README.md) | English
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
+![CI](https://github.com/wangzimu2007/genshin-artifact-toolkit/actions/workflows/ci.yml/badge.svg)
 ![Release](https://img.shields.io/github/v/release/wangzimu2007/genshin-artifact-toolkit)
 ![Platform](https://img.shields.io/badge/platform-Windows%2011%20%7C%20PowerShell%205.1-lightgrey)
 

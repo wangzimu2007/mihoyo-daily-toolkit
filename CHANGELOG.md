@@ -1,5 +1,39 @@
 # Changelog
 
+## v1.1.0 (2026-11-25)
+
+仓库从「原神专用」扩展为**三游戏每日自动化**，并补齐各自的判据与踩坑。
+
+### 新增 games/
+
+| 目录 | 内容 |
+|---|---|
+| games/genshin/ | BetterGI 一条龙包装器（un-with-restore.ps1）+ 分辨率切换（display.ps1） |
+| games/zzz/ | 绝区零后端启停、窗口聚焦、虚拟手柄服务（pad-service.py 等 6 个脚本） |
+| games/hsr/ | March7thAssistant 遗器清理与体力兜底 |
+
+每目录含 README：每日内容清单、完成判据、专属坑、要改的路径。
+
+### 三个游戏的关键差异
+
+| | 原神 | 绝区零 | 崩铁 |
+|---|---|---|---|
+| 需要前台 | 是 | 是 | 否（后台模式） |
+| 需要解锁会话 | 是 | 是 | 否（锁屏也能跑） |
+| 判据来源 | BGI 日志关键字 | pp_run_record/*.yml | uns/*.log |
+
+→ 守夜只需覆盖原神 + 绝区零时段；崩铁不需要。
+
+### 脱敏
+
+- 游戏脚本的工具目录改为 `\`，跨目录引用改用相对路径
+- 安装目录抽成 `\` / `\`（可用 `BGI_HOME` / `ZZZ_OD_ROOT` 覆盖）
+- `request.json` 明确与 `dispatcher.ps1` 同目录，避免调度器读不到
+
+### 已知未完成
+
+- GitHub Actions 工作流（`.github/workflows/ci.yml`）已写好但未推上：推送需要 `workflow` 权限，
+  而 `gh auth refresh` 依赖 `github.com`（当前网络不可达）。api.github.com 可正常推送其它文件。
 ## v1.0.1 (2026-11-25)
 
 补齐「开箱可用」缺的几块：

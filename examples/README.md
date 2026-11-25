@@ -13,20 +13,19 @@
 | 提权调度任务 | 计划任务 `BetterGIDispatch` | 自行用 `setup` 的方式创建 |
 | 工具目录 | `D:\tools\bgi-scan` | 所有脚本里的 `$bgi` |
 
+> **游戏专属脚本已移到 [`games/`](../games/)**：
+> 原神的 `run-with-restore.ps1` / `display.ps1` → `games/genshin/`；
+> 绝区零的 `zzz-focus.ps1` / `zzz-stop-flag.ps1` / `pad-*.ps1` → `games/zzz/`；
+> 崩铁的 `m7a-*.ps1` → `games/hsr/`。
+> 本目录只留**跨游戏编排**。
 ## 文件说明
 
 | 文件 | 作用 |
 |---|---|
 | `run-daily-all.ps1` | 每日总调度：原神 → 绝区零（串行，各自有超时上限） |
-| `run-with-restore.ps1` | 单游戏包装器：切 1080p → 启动 → 跑 → 关游戏 → 还原 4K → 判据 |
-| `display.ps1` | 切原神/绝区零的分辨率（改注册表，重启游戏生效） |
 | `dispatcher.ps1` | **提权调度器**：由计划任务以管理员运行，读 `request.json` 执行动作（启动游戏/关 BGI/聚焦/停后端…） |
 | `weekly-artifact-scan.ps1` | 每周圣遗物扫描全链路（扫描组 → 解析 → 评分 → 分配 → 清单） |
-| `zzz-focus.ps1` | 强制把游戏窗口拉到前台（ALT 解锁 + AttachThreadInput） |
-| `zzz-stop-flag.ps1` | 通过停止文件让已提权的 watcher 杀掉绝区零后端 |
-| `m7a-relic-daily.ps1` | 改 M7A 配置使当天必跑一次遗器清理（只改文件，不碰游戏） |
-| `m7a-fallback.ps1` | 崩铁体力兜底（清体力被背包卡住时改打拟造花萼） |
-| `pad-service-run.ps1` / `release-keys.ps1` | 虚拟手柄服务启停 / 强制松开修饰键 |
+| `release-keys.ps1` | 强制松开修饰键（防止 ALT/CTRL 卡住） |
 
 ## 为什么需要 dispatcher
 
