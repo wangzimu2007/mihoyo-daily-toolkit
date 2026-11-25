@@ -1,4 +1,4 @@
-# Genshin Artifact Toolkit
+# MiHoYo Daily Toolkit
 
 中文 | [English](README.en.md)
 
