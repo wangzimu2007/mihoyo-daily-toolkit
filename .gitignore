@@ -1,0 +1,20 @@
+# 生成的产物
+artifact/output/
+artifact/final/
+__pycache__/
+*.pyc
+
+# 运行日志与状态
+*.log
+.keepawake.stop
+request.json
+request.json.*
+.game-run.lock
+ALERT.txt
+run-status.log
+artifacts.json
+artifact_count.txt
+
+# 扫描日志（可能很大）
+record*/
+quarantine/
