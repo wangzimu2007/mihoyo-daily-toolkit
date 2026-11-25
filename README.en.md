@@ -1,45 +1,75 @@
-# Genshin Artifact Toolkit
+# MiHoYo Daily Toolkit
 
 [中文](README.md) | English
 
-![License](https://img.shields.io/badge/license-MIT-blue)
-![CI](https://github.com/wangzimu2007/genshin-artifact-toolkit/actions/workflows/ci.yml/badge.svg)
-![Release](https://img.shields.io/github/v/release/wangzimu2007/genshin-artifact-toolkit)
-![Platform](https://img.shields.io/badge/platform-Windows%2011%20%7C%20PowerShell%205.1-lightgrey)
+Daily-automation reliability toolkit for three HoYoverse games — **Genshin Impact**, **Zenless Zone Zero**,
+**Honkai: Star Rail** — plus an offline **artifact sorting pipeline** for Genshin.
 
-Two problems this repository solves, both from real daily use:
-
-1. **The artifact bag is full and there is no good way to decide what to keep.** Feed BetterGI's OCR scan log into an offline pipeline that scores every piece, assigns pieces to characters, and produces a keep/salvage list plus in-game lock-scheme suggestions.
-2. **Unattended daily automation fails silently.** Provide verdicts, post-run audits and session keep-alive so "did it actually run?" becomes a queryable log line instead of a guess.
+The three games share one idea: a run is only "done" when a **verdict** says so, not when a process exits.
+Everything else (keep-alive, post-run audit, lock diagnosis) exists to make that verdict trustworthy.
 
 > Every tool here only **analyzes, reports and keeps the session awake**. Nothing is ever decomposed, spent or claimed automatically.
 
 ## Layout
 
-| Directory | Contents | Requires |
+| Path | Contents | Requires |
 |---|---|---|
-| [`artifact/`](artifact/) | Artifact pipeline: parse → score → assign → lists → lock scheme | Python 3.8+, PyYAML |
+| [`artifact/`](artifact/) | Genshin artifact pipeline: parse → score → assign → lists → lock scheme | Python 3.8+, PyYAML |
+| [`games/genshin/`](games/genshin/) | Genshin daily chain (BetterGI one-dragon wrapper) | BetterGI |
+| [`games/zzz/`](games/zzz/) | ZZZ daily chain, virtual gamepad service, backend start/stop | ZZZ-OneDragon |
+| [`games/hsr/`](games/hsr/) | HSR daily chain and stamina fallback | March7thAssistant |
 | [`reliability/`](reliability/) | Keep-alive, post-run audit, lock diagnosis, input probe | Windows PowerShell 5.1+ |
-| [`examples/`](examples/) | Real orchestration scripts for Genshin / ZZZ / HSR — **paths must be adapted** | BetterGI, ZZZ-OneDragon, March7thAssistant |
+| [`scripts/`](scripts/) | Install/uninstall Windows scheduled tasks | Windows |
+| [`examples/`](examples/) | Cross-game orchestration (dispatcher, weekly scan) — **paths must be adapted** | — |
 | [`docs/`](docs/) | Field-tested pitfalls | — |
-| [`samples/`](samples/) | Example outputs | — |
+| [`samples/`](samples/) | Example outputs + **offline self-test sample log** | — |
+
+## Why three games need three different setups
+
+| | Genshin | ZZZ | HSR |
+|---|---|---|---|
+| Driver | BetterGI | ZZZ-OneDragon | March7thAssistant |
+| Needs foreground window | yes | yes | **no** (background mode) |
+| Needs unlocked session | yes | yes | **no** (works while locked) |
+| Verdict source | BGI log keywords | `app_run_record/*.yml` | M7A `runs/*.log` |
+| Typical failure | window not foregrounded / missing combat-strategy file | backend down / gamepad service killed | inventory full blocks stamina spending |
+
+**Consequence**: the anti-lock keep-alive only has to cover Genshin + ZZZ windows; HSR runs fine while locked.
 
 ## Quick start
 
-### Artifacts: from scan log to keep/salvage list
+### Artifacts
 
 ```bash
 export BGI_HOME="/path/to/BetterGI"       # Windows: set BGI_HOME=D:\software\BetterGI
 cd artifact
-python parse_artifact_log.py --latest     # log -> artifacts.json
-python evaluate.py                        # rules -> keep / salvage / report
-python build_characters.py                # infer character profiles from equipped gear
-python assign.py                          # character x artifact assignment
-python make_final_lists.py                # final list + lock-scheme suggestions
-python four_star_rolling.py               # 4-star rolling eviction
+pip install -r requirements.txt
+python parse_artifact_log.py --latest
+python evaluate.py
+python build_characters.py
+python assign.py
+python make_final_lists.py
+python four_star_rolling.py
 ```
 
-### Reliability: make the 4 AM run actually happen
+One command on Windows: `.\artifact\run-pipeline.ps1 -BgiHome "D:\software\BetterGI"`
+
+**No game needed** — the repo ships a sample scan log:
+
+```powershell
+.\samples\offline-test.ps1
+```
+
+### Daily automation
+
+```powershell
+.\scripts\install-tasks.ps1 -KeepAwake -DailyAll -WeeklyScan -ToolkitRoot "D:\tools\bgi-scan"
+.\examples\run-daily-all.ps1        # Genshin → ZZZ
+```
+
+Optional environment overrides: `BGI_HOME` (BetterGI install dir), `ZZZ_OD_ROOT` (ZZZ-OneDragon dir).
+
+### Reliability
 
 ```powershell
 .\reliability\keepawake.ps1 -Until 09:05 -AllowDisplayOff
@@ -47,23 +77,23 @@ python four_star_rolling.py               # 4-star rolling eviction
 .\reliability\lock-monitor.ps1 -UntilHour 12
 ```
 
-## Scoring model
+## Scoring model (artifacts)
 
-- **Useful-roll count** = Σ(substat value ÷ max value of one roll), counting only *useful* substats. A 5★ piece gets 9 rolls in total, so the ceiling is ~9. Community tiers: **S≥8 / A≥7 / B 5–6 / C≤4**.
-- **Crit value** = CRIT DMG + 2 × CRIT Rate (substats only). 30–35 is acceptable, 40+ is good.
-- **Salvage rule is a double condition**: a piece becomes a salvage candidate only if *the rules score it low* **and** *no character profile can use it*. This protects unleveled "potential" pieces and pieces reserved for future characters.
+- **Useful rolls** = Σ(substat value ÷ one-roll max), only counting *useful* substats. A 5★ piece gets 9 rolls total, so the ceiling is ~9. Tiers: **S≥8 / A≥7 / B 5–6 / C≤4**.
+- **Crit value** = CRIT DMG + 2 × CRIT Rate (substats only). 30–35 acceptable, 40+ good.
+- **Salvage is a double condition**: low rule score **and** no character can use it — protecting unleveled "potential" pieces.
 
-## Three pitfalls that cost the most time
+## Three pitfalls worth the read
 
-1. **`SetCursorPos` does not count as user input.** To defeat the idle lock you must emit real input (`mouse_event` / `SendInput`); otherwise the idle timer keeps climbing and the session locks as if nothing was running. See [docs/pitfalls.md](docs/pitfalls.md#1-setcursorpos-不重置空闲计时).
-2. **Nothing in user space can unlock a locked session.** The lock screen runs in a separate security context — Microsoft's own PowerToys Awake documentation states it cannot work while the lock screen is displayed. You can only *prevent* the lock.
-3. **Verdicts must not read only the tail of a log.** Long flows write thousands of lines; filtering by a run start timestamp is required or the evidence gets scrolled away.
+1. **`SetCursorPos` does not count as user input** — anti-lock scripts must emit real input (`mouse_event` / `SendInput`), otherwise the idle timer keeps climbing. See [docs/pitfalls.md](docs/pitfalls.md).
+2. **Nothing in user space can unlock a locked session** — Microsoft's own PowerToys Awake docs confirm it; you can only *prevent* the lock.
+3. **Verdicts must not read only the log tail** — long flows write thousands of lines and scroll the evidence away; filter by run start timestamp.
 
 ## Disclaimer
 
-- Scripts under `examples/` control game windows and simulate input. Make sure that is acceptable under your game's terms of service.
-- The artifact pipeline only produces suggestions. **Decomposition is irreversible** — review before acting.
-- No account credentials, UIDs or cookies are included. `characters.yaml` is inferred from equipped artifacts and contains no account identifiers.
+- Scripts under `games/` and `examples/` control game windows and simulate input. Make sure that is acceptable under your game's terms of service.
+- The artifact pipeline only produces suggestions. **Decomposition is irreversible.**
+- No account credentials, UIDs or cookies are included.
 
 ## License
 
