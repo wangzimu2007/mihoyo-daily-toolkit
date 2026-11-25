@@ -2,6 +2,10 @@
 
 [中文](README.md) | English
 
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Release](https://img.shields.io/github/v/release/wangzimu2007/genshin-artifact-toolkit)
+![Platform](https://img.shields.io/badge/platform-Windows%2011%20%7C%20PowerShell%205.1-lightgrey)
+
 Two problems this repository solves, both from real daily use:
 
 1. **The artifact bag is full and there is no good way to decide what to keep.** Feed BetterGI's OCR scan log into an offline pipeline that scores every piece, assigns pieces to characters, and produces a keep/salvage list plus in-game lock-scheme suggestions.

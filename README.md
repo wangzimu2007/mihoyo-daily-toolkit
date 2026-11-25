@@ -2,6 +2,10 @@
 
 中文 | [English](README.en.md)
 
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Release](https://img.shields.io/github/v/release/wangzimu2007/genshin-artifact-toolkit)
+![Platform](https://img.shields.io/badge/platform-Windows%2011%20%7C%20PowerShell%205.1-lightgrey)
+
 原神圣遗物整理 + 游戏自动化可靠性工具集。
 
 针对两个真实痛点：
